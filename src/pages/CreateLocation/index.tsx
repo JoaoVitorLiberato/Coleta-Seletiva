@@ -2,7 +2,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { LeafletMouseEvent } from 'leaflet'
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState, useCallback } from 'react';
 
 import api from '../../services/api';
 
@@ -37,23 +37,23 @@ export default function CreateLocation() {
             })
     }, []);
 
-    function handleMapClick(event: LeafletMouseEvent): void {
+    const handleMapClick = useCallback((event: LeafletMouseEvent): void => {
         // console.log(event);
         setPosicao([
             event.latlng.lat,
             event.latlng.lng,
         ]);
-    }
+    }, [])
 
-    function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target
         setDataForm({
             ...dataForm,
             [name]: value
         })
-    }
+    }, [dataForm])
 
-    function handleItem(id: number) {
+    const  handleItem = useCallback((id: number) => {
         // setItemSelecionados([...itensSelecionado, id]);
         const procurarItens = itensSelecionado.findIndex(items => items === id)
         if (procurarItens >= 0) {
@@ -62,9 +62,9 @@ export default function CreateLocation() {
         } else {
             setItemSelecionados([...itensSelecionado, id]);
         }
-    }
+    }, [itensSelecionado])
 
-    async function handleSubmit(event: FormEvent) {
+    const handleSubmit = useCallback(async(event: FormEvent) => {
         event.preventDefault();
         const { name, email, wattsapp, city, uf } = dataForm;
         const [latitude, longetude] = posicao;
@@ -82,7 +82,7 @@ export default function CreateLocation() {
         }
         await api.post('locations', data);
         {alert('Formulario enviado com sucesso!')}
-    }
+    }, [dataForm, posicao, itensSelecionado])
 
 
     return (
